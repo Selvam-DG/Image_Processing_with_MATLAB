@@ -1,3 +1,9 @@
+## Content:
+#### Extracting Metadata from Image Files
+#### Representing Different Image Types
+#### Converting Image Data Types
+#### Working with Binary Images
+
 -  use the imfinfo function to extract image file information.
   - info = imfinfo("filename.png")
 - To extract a field from a structure, use dot notation.
