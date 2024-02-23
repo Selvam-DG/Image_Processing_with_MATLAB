@@ -55,5 +55,79 @@
 - Filter Noise:
   - fspecial function to create an n-by-n averaging filter.
     - F = fspecial("average",n)
-  - pply a filter F to an image I by using the imfilter function.
+  - Apply a filter F to an image I by using the imfilter function.
     - Ifltr = imfilter(I,F);
+    - To adjust this behavior, use the "replicate" option.Ifltr = imfilter(I,F,"replicate");
+
+- Isolate the Image Background
+  - Receipt images that have a busy background are more difficult to classify because artifacts pollute the row sum. To mitigate this issue, you can isolate the background and then remove it by subtraction.
+  - In a receipt image, the background is anything that is not text, so isolating the background can be interpreted as removing the text. One way to remove text from an image is to use morphological operations.
+  - can create a structuring element by using the strel function.
+    - SE = strel("diamond",5) = > defines SE as a diamond-shaped structuring element with a radius of 5 pixels
+  - To perform a closing operation on an image I with structuring element SE, use the imclose function.
+    - Iclosed = imclose(I,SE);
+  -  NOT operator (~). 
+
+
+- Enhancing Patterns
+  - Morphological operations are useful not only for removing features from an image but also for augmenting features. You can use morphology to enhance the text in the binary image and improve the row sum signal.
+  - Morphological opening expands the dark text regions, while closing diminishes them. Increasing the size of the structuring element increases these effects.
+  - can create a rectangular structuring element using strel with a size array in the format [height width].
+    - SE = strel("rectangle",[10 20]);
+  - imopen with a wide rectangular structuring element turns lines of text into black horizontal stripes, which augments the valleys in the row sum signal.
+    - Iopened = imopen(I,SE);
+
+
+### Batch Processing with Iamge DataStore
+
+- The imageDatastore function creates an image datastore for all the image files in a folder but won't load them into memory until they are requested.
+  - ds = imageDatastore("localFolder")
+- we can access the datastore's properties by using a period (.)
+  - ds.Folders
+
+- The readimage function loads the nth image from an image datastore into the MATLAB workspace.
+  - img = readimage(ds,n);
+
+
+# Overall Algorithm
+function isReceipt = classifyImage(I)
+    % This function processes an image and
+    % classifies the image as receipt or non-receipt
+    
+    % Processing
+    gs = im2gray(I);
+    gs = imadjust(gs);
+    
+    mask = fspecial("average",3);
+    gsSmooth = imfilter(gs,mask,"replicate");
+    
+    SE = strel("disk",8);  
+    Ibg = imclose(gsSmooth, SE);
+    Ibgsub =  Ibg - gsSmooth;
+    Ibw = ~imbinarize(Ibgsub);
+    
+    SE = strel("rectangle",[3 25]);
+    stripes = imopen(Ibw, SE);
+    
+    signal = sum(stripes,2);  
+
+    % Classification
+    minIndices = islocalmin(signal,"MinProminence",70,"ProminenceWindow",25); 
+    nMin = nnz(minIndices);
+    isReceipt = nMin >= 9;
+    
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
