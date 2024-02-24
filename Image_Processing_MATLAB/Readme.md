@@ -30,4 +30,3 @@
 - Aligning Images with Image Registration
   - Register images using phase correlation, control points, and feature matching.
 
-[Image_processing_with_matlab.pdf](https://github.com/Selvam-DG/Image_Processing_with_MATLAB/files/14393263/Image_processing_with_matlab.pdf)
