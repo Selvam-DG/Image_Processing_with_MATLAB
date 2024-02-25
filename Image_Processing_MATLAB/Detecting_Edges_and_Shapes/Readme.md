@@ -31,8 +31,13 @@
 - This process is repeated for each true value in the binary mask, creating overlapping sine curves.
 - By identifying the peaks in the Hough transform, you can identify the lines that exist in the image.
 
+- skeletonization and can be performed with the bwmorph function.
+  - BW2 = bwmorph(BW,operation,n);
+- use the hough function to compute the Hough transform of a binary image. This is the first of three functions used to identify straight lines.
+  - [H,theta,rho] = hough(BW);
 
+- identify the peaks using houghpeaks.
+  - peaks = houghpeaks(H,numpeaks)
 
-
-
-
+- After identified the peaks, you can find lines in the image.
+  - lines = houghlines(BW,theta,rho,peaks)
